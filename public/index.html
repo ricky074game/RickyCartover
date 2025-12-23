@@ -43,7 +43,8 @@
         }
 
         #cursor-normal { transform-origin: top left; } 
-        #cursor-hover { transform-origin: center; animation: spin 0.6s linear infinite; }
+        #cursor-hover { transform-origin: center; animation: spin 2.5s linear infinite; }
+        #cursor-drag { z-index: 99999 !important; }
         
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -110,17 +111,15 @@
         <!-- Content Panels -->
         <div id="panel-about" class="content-panel">
             <h2>Identity</h2>
-            <p>I am a Full Stack Developer & Game Architect. I build digital experiences that break the mold.</p>
+            <p>Full Stack Developer & Game Architect from Italy 🇮🇹. I build immersive digital experiences across multiple platforms and technologies.</p>
             <div class="mt-4 flex flex-wrap gap-2">
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">JAVA</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">FLUTTER</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">RUST</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">C#/.NET</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">PHASER3</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">NODE.JS</span>
                 <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">THREE.JS</span>
-                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">REACT</span>
-                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">UNITY</span>
-                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">NODE</span>
-            </div>
-            
-            <h3 class="mt-6 mb-3 text-sm font-semibold">GitHub Stats</h3>
-            <div class="space-y-2 text-xs">
-                <img src="https://github-readme-stats.vercel.app/api?username=ricky074game&show_icons=true&theme=dark&bg_color=0a0a0a&border_color=ffffff&text_color=ffffff" alt="GitHub Stats" style="width: 100%; border-radius: 8px;">
             </div>
         </div>
 
@@ -251,6 +250,16 @@
             el.addEventListener('mouseleave', () => {
                 hoverCursor.classList.remove('active');
                 normalCursor.classList.add('active');
+            });
+        });
+
+        // Hide cursor over icon elements
+        document.querySelectorAll('i.fa-brands, i.fa-solid, svg').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.opacity = '0';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.opacity = '1';
             });
         });
     </script>
