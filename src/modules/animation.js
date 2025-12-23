@@ -72,6 +72,20 @@ export class AnimationLoop {
         const pointer = this.interactionManager.getPointer();
         const currentState = this.stateManager.getCurrentState();
 
+        // Convert pointer from normalized device coordinates to world space
+        const raycaster = this.interactionManager.raycaster;
+        raycaster.setFromCamera(pointer, this.camera);
+        
+        // Get a point along the raycaster direction (at z=0 plane for 2D repulsion)
+        const direction = raycaster.ray.direction;
+        const origin = raycaster.ray.origin;
+        const t = -origin.z / direction.z; // Find where ray intersects z=0 plane
+        const mouseWorldPos = new THREE.Vector3(
+            origin.x + direction.x * t,
+            origin.y + direction.y * t,
+            0
+        );
+
         for (let i = 0; i < CONFIG.PARTICLE_COUNT; i++) {
             const ix = i * 3;
             const iy = i * 3 + 1;
@@ -121,12 +135,12 @@ export class AnimationLoop {
                 }
             }
 
-            // Mouse repulsion
-            const dx = positionsArr[ix] - (pointer.x * 35);
-            const dy = positionsArr[iy] - (pointer.y * 35);
+            // Mouse repulsion using world space coordinates
+            const dx = positionsArr[ix] - mouseWorldPos.x;
+            const dy = positionsArr[iy] - mouseWorldPos.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < REPULSION_RADIUS) {
+            if (dist < REPULSION_RADIUS && dist > 0.01) {
                 const force = (REPULSION_RADIUS - dist) * REPULSION_STRENGTH;
                 const angle = Math.atan2(dy, dx);
                 positionsArr[ix] += Math.cos(angle) * force * dt * 10;
