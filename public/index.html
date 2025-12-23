@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RICKY // QUANTUM PORTFOLIO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/css/style.css">
+</head>
+<body>
+
+    <div id="loader">
+        <div style="font-size: 1.5rem; letter-spacing: 5px; color: white;">INITIALIZING SYSTEM</div>
+        <div class="loader-bar"><div class="loader-progress" id="progress-bar"></div></div>
+    </div>
+
+    <div id="canvas-container"></div>
+    
+    <div id="link-notification">CLICK GITHUB LOGO</div>
+
+    <div id="ui-layer">
+        <!-- Header -->
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold tracking-[0.2em] text-white">RICKY<span style="color:var(--accent)">074</span></h1>
+                <div class="text-xs text-gray-500 tracking-widest mt-1">INTERACTIVE PORTFOLIO V5</div>
+            </div>
+            <div class="flex gap-2">
+                <a href="https://github.com/ricky074game" target="_blank" class="interactive text-white hover:text-[var(--accent)] transition-colors text-2xl"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+
+        <!-- Content Panels -->
+        <div id="panel-about" class="content-panel">
+            <h2>Identity</h2>
+            <p>I am a Full Stack Developer & Game Architect. I build digital experiences that break the mold.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">THREE.JS</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">REACT</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">UNITY</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">NODE</span>
+            </div>
+        </div>
+
+        <div id="panel-projects" class="content-panel">
+            <h2>Modules</h2>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Void Runner</h3>
+                <span>UNITY // C# // HLSL</span>
+            </div>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Neural Viz</h3>
+                <span>WEBGL // REACT</span>
+            </div>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Auto-Bot 9000</h3>
+                <span>PYTHON // AI</span>
+            </div>
+        </div>
+
+        <div id="panel-contact" class="content-panel">
+            <h2>Link Up</h2>
+            <p>Ready to collaborate on the next big thing?</p>
+            <form class="mt-4 space-y-2" onsubmit="event.preventDefault(); alert('Message simulation sent.');">
+                <input type="email" placeholder="YOUR FREQUENCY (EMAIL)" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive">
+                <textarea rows="3" placeholder="TRANSMISSION DATA" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive"></textarea>
+                <button class="w-full bg-[var(--accent)] text-black font-bold py-2 text-sm hover:bg-white transition-colors interactive">SEND</button>
+            </form>
+        </div>
+
+        <!-- Navigation Bottom -->
+        <div class="flex flex-col items-center">
+            <div class="mouse-hint">Interact with the particles</div>
+            <nav class="flex mb-8 interactive pointer-events-auto">
+                <button class="nav-btn active" onclick="changeState('home')">HOME</button>
+                <button class="nav-btn" onclick="changeState('about')">ABOUT</button>
+                <button class="nav-btn" onclick="changeState('projects')">PROJECTS</button>
+                <button class="nav-btn" onclick="changeState('contact')">CONTACT</button>
+            </nav>
+        </div>
+    </div>
+
+    <script type="module" src="../src/js/main.js"></script>
+</body>
+</html>
