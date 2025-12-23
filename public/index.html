@@ -51,53 +51,62 @@
 
         <div id="panel-projects" class="content-panel">
             <h2>Timeline</h2>
-            <div class="space-y-6 max-h-screen overflow-y-auto" id="projects-scroll-container">
-                <!-- Middle School -->
-                <div class="timeline-item" onclick="window.open('https://github.com/Tuvalu23/College-Admissions-Simulator', '_blank')" style="border-left: 3px solid #00bfff; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#00bfff] mb-1">MIDDLE SCHOOL</div>
-                    <h3 class="font-semibold">College Admissions Simulator</h3>
-                    <span class="text-xs text-gray-400">Java</span>
-                    <p class="text-xs text-gray-400 mt-1">Simulates the college application process with focus on NY students at Stuyvesant High School. Includes weighted GPA, demographic scoring, and early decision/action logic.</p>
+            <div class="relative">
+                <div id="projects-carousel" class="space-y-4" style="min-height: 400px;">
+                    <!-- Middle School -->
+                    <div class="timeline-item" data-project="0" onclick="window.open('https://github.com/Tuvalu23/College-Admissions-Simulator', '_blank')" style="border-left: 3px solid #00bfff; padding-left: 16px; cursor: pointer;">
+                        <div class="text-xs font-semibold text-[#00bfff] mb-1">MIDDLE SCHOOL</div>
+                        <h3 class="font-semibold text-lg">College Admissions Simulator</h3>
+                        <span class="text-xs text-gray-400">Java</span>
+                        <p class="text-xs text-gray-400 mt-2">Simulates the college application process with focus on NY students at Stuyvesant High School. Includes weighted GPA, demographic scoring, and early decision/action logic.</p>
+                    </div>
+
+                    <!-- High School -->
+                    <div class="timeline-item" data-project="1" onclick="window.open('https://github.com/ricky074game/NHSLocation', '_blank')" style="border-left: 3px solid #00ffaa; padding-left: 16px; cursor: pointer; display:none;">
+                        <div class="text-xs font-semibold text-[#00ffaa] mb-1">HIGH SCHOOL</div>
+                        <h3 class="font-semibold text-lg">NHS Location</h3>
+                        <span class="text-xs text-gray-400">Dart + JavaScript + Firebase</span>
+                        <p class="text-xs text-gray-400 mt-2">Flutter application for NHS members sign-in with location tracking and geospatial features. Built with Firebase backend for real-time data sync.</p>
+                    </div>
+
+                    <!-- College Year 1 -->
+                    <div class="timeline-item" data-project="2" onclick="window.open('https://github.com/ricky074game/cometOffline', '_blank')" style="border-left: 3px solid #ff6b9d; padding-left: 16px; cursor: pointer; display:none;">
+                        <div class="text-xs font-semibold text-[#ff6b9d] mb-1">COLLEGE</div>
+                        <h3 class="font-semibold text-lg">CometOffline</h3>
+                        <span class="text-xs text-gray-400">Rust</span>
+                        <p class="text-xs text-gray-400 mt-2">Open source implementation of GOG Galaxy Communication Service. Supports game launchers like Heroic and Lutris. Enables offline game functionality and achievement tracking across platforms.</p>
+                    </div>
+
+                    <!-- College Year 2 -->
+                    <div class="timeline-item" data-project="3" onclick="window.open('https://github.com/ricky074game/RevoltUltimate', '_blank')" style="border-left: 3px solid #ffd700; padding-left: 16px; cursor: pointer; display:none;">
+                        <div class="text-xs font-semibold text-[#ffd700] mb-1">COLLEGE</div>
+                        <h3 class="font-semibold text-lg">Revolt Ultimate</h3>
+                        <span class="text-xs text-gray-400">C#</span>
+                        <p class="text-xs text-gray-400 mt-2">Modern .NET achievement tracking system for multiple platforms (Steam, GOG, Xbox, Epic, EA). Features real-time notifications, custom achievement displays, and leveling system across 8+ gaming platforms.</p>
+                    </div>
+
+                    <!-- College Year 3 -->
+                    <div class="timeline-item" data-project="4" onclick="window.open('https://github.com/ricky074game/Kawairun2-Server', '_blank')" style="border-left: 3px solid #ff1493; padding-left: 16px; cursor: pointer; display:none;">
+                        <div class="text-xs font-semibold text-[#ff1493] mb-1">COLLEGE</div>
+                        <h3 class="font-semibold text-lg">Kawairun2 Server</h3>
+                        <span class="text-xs text-gray-400">C# + Java + Node.js</span>
+                        <p class="text-xs text-gray-400 mt-2">Complete reimplementation of Kawairun 2 multiplayer Flash game infrastructure. Includes Windows launcher, SmartFoxServer extension, web server, and database management system (kawairun2.puzzlebest.tech).</p>
+                    </div>
+
+                    <!-- Hackathon -->
+                    <div class="timeline-item" data-project="5" onclick="window.open('https://github.com/ModeSpace/Winter25-Hackathon', '_blank')" style="border-left: 3px solid #00ffff; padding-left: 16px; cursor: pointer; display:none;">
+                        <div class="text-xs font-semibold text-[#00ffff] mb-1">HACKATHON</div>
+                        <h3 class="font-semibold text-lg">Snowball Thrower</h3>
+                        <span class="text-xs text-gray-400">JavaScript + Phaser3 + MediaPipe</span>
+                        <p class="text-xs text-gray-400 mt-2">Phaser3 multiplayer game with optional hand-tracking via webcam using MediaPipe HandLandmarker. Features single-player AI, network multiplayer, sprite animations, snowball physics, and real-time health/charge mechanics.</p>
+                    </div>
                 </div>
 
-                <!-- High School -->
-                <div class="timeline-item" onclick="window.open('https://github.com/ricky074game/NHSLocation', '_blank')" style="border-left: 3px solid #00ffaa; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#00ffaa] mb-1">HIGH SCHOOL</div>
-                    <h3 class="font-semibold">NHS Location</h3>
-                    <span class="text-xs text-gray-400">Dart + JavaScript + Firebase</span>
-                    <p class="text-xs text-gray-400 mt-1">Flutter application for NHS members sign-in with location tracking and geospatial features. Built with Firebase backend for real-time data sync.</p>
-                </div>
-
-                <!-- College Year 1 -->
-                <div class="timeline-item" onclick="window.open('https://github.com/ricky074game/cometOffline', '_blank')" style="border-left: 3px solid #ff6b9d; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#ff6b9d] mb-1">COLLEGE</div>
-                    <h3 class="font-semibold">CometOffline</h3>
-                    <span class="text-xs text-gray-400">Rust</span>
-                    <p class="text-xs text-gray-400 mt-1">Open source implementation of GOG Galaxy Communication Service. Supports game launchers like Heroic and Lutris. Enables offline game functionality and achievement tracking across platforms.</p>
-                </div>
-
-                <!-- College Year 2 -->
-                <div class="timeline-item" onclick="window.open('https://github.com/ricky074game/RevoltUltimate', '_blank')" style="border-left: 3px solid #ffd700; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#ffd700] mb-1">COLLEGE</div>
-                    <h3 class="font-semibold">Revolt Ultimate</h3>
-                    <span class="text-xs text-gray-400">C#</span>
-                    <p class="text-xs text-gray-400 mt-1">Modern .NET achievement tracking system for multiple platforms (Steam, GOG, Xbox, Epic, EA). Features real-time notifications, custom achievement displays, and leveling system across 8+ gaming platforms.</p>
-                </div>
-
-                <!-- College Year 3 -->
-                <div class="timeline-item" onclick="window.open('https://github.com/ricky074game/Kawairun2-Server', '_blank')" style="border-left: 3px solid #ff1493; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#ff1493] mb-1">COLLEGE</div>
-                    <h3 class="font-semibold">Kawairun2 Server</h3>
-                    <span class="text-xs text-gray-400">C# + Java + Node.js</span>
-                    <p class="text-xs text-gray-400 mt-1">Complete reimplementation of Kawairun 2 multiplayer Flash game infrastructure. Includes Windows launcher, SmartFoxServer extension, web server, and database management system (kawairun2.puzzlebest.tech).</p>
-                </div>
-
-                <!-- Hackathon -->
-                <div class="timeline-item" onclick="window.open('https://github.com/ModeSpace/Winter25-Hackathon', '_blank')" style="border-left: 3px solid #00ffff; padding-left: 16px; cursor: pointer;">
-                    <div class="text-xs font-semibold text-[#00ffff] mb-1">HACKATHON</div>
-                    <h3 class="font-semibold">Snowball Thrower</h3>
-                    <span class="text-xs text-gray-400">JavaScript + Phaser3 + MediaPipe</span>
-                    <p class="text-xs text-gray-400 mt-1">Phaser3 multiplayer game with optional hand-tracking via webcam using MediaPipe HandLandmarker. Features single-player AI, network multiplayer, sprite animations, snowball physics, and real-time health/charge mechanics.</p>
+                <!-- Navigation Arrows -->
+                <div class="flex justify-between mt-6">
+                    <button id="projects-prev" class="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded transition" onclick="window.navigateProjects(-1)">← Prev</button>
+                    <span id="projects-counter" class="text-xs text-gray-400 self-center">1 / 6</span>
+                    <button id="projects-next" class="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded transition" onclick="window.navigateProjects(1)">Next →</button>
                 </div>
             </div>
         </div>

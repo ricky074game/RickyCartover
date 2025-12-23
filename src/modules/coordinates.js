@@ -11,8 +11,8 @@ export class CoordinateGenerator {
     getCanvasCoordinates(text, font, scale = 0.15) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 800;
-        canvas.height = 200;
+        canvas.width = 1200;
+        canvas.height = 300;
 
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -26,7 +26,7 @@ export class CoordinateGenerator {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         const coords = [];
-        const step = 3;
+        const step = 2;
 
         for (let y = 0; y < canvas.height; y += step) {
             for (let x = 0; x < canvas.width; x += step) {
@@ -370,8 +370,8 @@ export class CoordinateGenerator {
     async generate() {
         const { PARTICLE_COUNT, SPHERE_RADIUS, HELIX_RADIUS, HELIX_HEIGHT, HELIX_TURNS, GRID_SIZE, GRID_STEP } = CONFIG;
 
-        // 1. Home: Text "RICKY"
-        this.homeCoords = this.getCanvasCoordinates("RICKY", 'bold 80px "Rajdhani"', 0.25);
+        // 1. Home: Text "RICKY" - much larger
+        this.homeCoords = this.getCanvasCoordinates("RICKY", 'bold 150px "Rajdhani"', 0.2);
 
         // 2. About: Human icon
         this.aboutCoords = this.drawIcon((ctx, cx, cy, size) => this.drawHumanIcon(ctx, cx, cy, size), 0.08);

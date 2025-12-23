@@ -77,8 +77,29 @@ class PortfolioApp {
             this.stateManager.setTargets(state, coords);
         };
 
-        // Handle projects scroll to change particle logos
-        this.setupProjectsScrollDetection();
+        // Handle projects carousel navigation
+        let currentProjectIndex = 0;
+        window.navigateProjects = (direction) => {
+            currentProjectIndex += direction;
+            currentProjectIndex = (currentProjectIndex + 6) % 6; // Wrap around
+            
+            const coords = this.coordinateGenerator.getLanguageLogo(currentProjectIndex);
+            if (coords && coords.length > 0) {
+                this.stateManager.setTargets('projects', coords, true);
+            }
+
+            // Update display
+            const items = document.querySelectorAll('.timeline-item');
+            items.forEach((item, idx) => {
+                item.style.display = idx === currentProjectIndex ? 'block' : 'none';
+            });
+
+            // Update counter
+            const counter = document.getElementById('projects-counter');
+            if (counter) {
+                counter.textContent = `${currentProjectIndex + 1} / 6`;
+            }
+        };
     }
 
     setupProjectsScrollDetection() {
