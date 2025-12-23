@@ -2,7 +2,6 @@
   "name": "ricky-quantum-portfolio",
   "version": "5.0.0",
   "description": "Interactive quantum portfolio with particle system",
-  "main": "src/js/main.js",
   "type": "module",
   "scripts": {
     "dev": "parcel public/index.html --port 3000",
