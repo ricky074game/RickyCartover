@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/index.min.js"></script>
     <style>
         /* Custom Cursor Styling */
         html, body { cursor: none !important; }
@@ -20,7 +21,7 @@
             width: 40px;
             height: 40px;
             pointer-events: none;
-            z-index: 999999;
+            z-index: 9999999;
             mix-blend-mode: exclusion;
         }
 
@@ -45,7 +46,7 @@
 
         #cursor-normal { transform-origin: top left; } 
         #cursor-hover { transform-origin: center; animation: spin 2.5s linear infinite; }
-        #cursor-drag { z-index: 999999 !important; }
+        #cursor-drag { z-index: 9999999 !important; }
         
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -188,22 +189,22 @@
 
         <div id="panel-contact" class="content-panel">
             <h2>Connect</h2>
-            <div class="space-y-4">
+            <form id="contact-form" class="space-y-4">
                 <div>
-                    <p class="text-sm mb-3">Get in touch for collaborations or inquiries:</p>
-                    <div class="space-y-2">
-                        <a href="https://github.com/ricky074game" target="_blank" class="flex items-center gap-2 text-white hover:text-[var(--accent)] transition-colors text-sm">
-                            <i class="fa-brands fa-github"></i> GitHub
-                        </a>
-                        <a href="https://www.linkedin.com/in/riccardo-sambataro-3875892b8/" target="_blank" class="flex items-center gap-2 text-white hover:text-[var(--accent)] transition-colors text-sm">
-                            <i class="fa-brands fa-linkedin"></i> LinkedIn
-                        </a>
-                        <a href="mailto:ricky074game@gmail.com" class="flex items-center gap-2 text-white hover:text-[var(--accent)] transition-colors text-sm">
-                            <i class="fa-solid fa-envelope"></i> Email
-                        </a>
-                    </div>
+                    <label for="name" class="block text-sm font-semibold mb-2 text-white">Name</label>
+                    <input type="text" id="name" name="name" required class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:border-[var(--accent)]" placeholder="Your name">
                 </div>
-            </div>
+                <div>
+                    <label for="email" class="block text-sm font-semibold mb-2 text-white">Email</label>
+                    <input type="email" id="email" name="email" required class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:border-[var(--accent)]" placeholder="your@email.com">
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-semibold mb-2 text-white">Message</label>
+                    <textarea id="message" name="message" required rows="4" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:border-[var(--accent)] resize-none" placeholder="Your message..."></textarea>
+                </div>
+                <button type="submit" class="w-full px-4 py-2 bg-[var(--accent)] text-black font-semibold rounded hover:bg-[#00d4ff] transition-colors">Send Message</button>
+                <div id="form-status" class="text-sm text-[var(--accent)] hidden"></div>
+            </form>
         </div>
 
         <!-- Navigation Bottom -->
@@ -234,11 +235,13 @@
         document.addEventListener('mousedown', (e) => {
             normalCursor.classList.remove('active');
             dragCursor.classList.add('active');
+            cursor.style.opacity = '1'; // Ensure cursor stays visible
         });
 
         document.addEventListener('mouseup', () => {
             dragCursor.classList.remove('active');
             normalCursor.classList.add('active');
+            cursor.style.opacity = '1'; // Ensure cursor stays visible
         });
 
         // Add hover effects to interactive elements
@@ -246,10 +249,12 @@
             el.addEventListener('mouseenter', () => {
                 normalCursor.classList.remove('active');
                 hoverCursor.classList.add('active');
+                cursor.style.opacity = '1'; // Ensure cursor stays visible
             });
             el.addEventListener('mouseleave', () => {
                 hoverCursor.classList.remove('active');
                 normalCursor.classList.add('active');
+                cursor.style.opacity = '1'; // Ensure cursor stays visible
             });
         });
 
@@ -260,6 +265,41 @@
             });
             el.addEventListener('mouseleave', () => {
                 cursor.style.opacity = '1';
+            });
+        });
+
+        // Initialize EmailJS
+        emailjs.init('K-K1yMpLcKb1PVR87');
+
+        // Contact form handler
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            const statusDiv = document.getElementById('form-status');
+
+            // Send email using EmailJS
+            emailjs.send('service_portfolio', 'template_portfolio', {
+                to_email: 'ricky.sambataro@gmail.com',
+                from_name: name,
+                from_email: email,
+                message: message
+            }).then(function(response) {
+                console.log('Email sent successfully!', response.status, response.text);
+                statusDiv.textContent = '✓ Message sent successfully!';
+                statusDiv.classList.remove('hidden');
+                document.getElementById('contact-form').reset();
+                
+                // Hide status after 5 seconds
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 5000);
+            }).catch(function(error) {
+                console.log('Failed to send email:', error);
+                statusDiv.textContent = '✗ Failed to send. Please try again.';
+                statusDiv.classList.remove('hidden');
             });
         });
     </script>
