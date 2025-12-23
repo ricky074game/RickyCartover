@@ -31,12 +31,18 @@ export class InteractionManager {
         });
 
         document.addEventListener('click', (event) => {
-            if (this.stateManager.getCurrentState() === 'projects') {
-                if (event.target.tagName !== 'BUTTON' &&
-                    event.target.tagName !== 'A' &&
-                    !event.target.closest('.content-panel')) {
-                    // Can trigger action here if needed
-                }
+            const currentState = this.stateManager.getCurrentState();
+            
+            // Ignore clicks on UI elements
+            if (event.target.tagName === 'BUTTON' ||
+                event.target.tagName === 'A' ||
+                event.target.closest('.content-panel')) {
+                return;
+            }
+
+            // Handle projects state click - open GitHub
+            if (currentState === 'projects') {
+                window.open('https://github.com/ricky074game', '_blank');
             }
         });
     }
