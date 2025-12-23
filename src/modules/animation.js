@@ -130,8 +130,10 @@ export class AnimationLoop {
                     positionsArr[iz] = x * Math.sin(spinSpeed) + z * Math.cos(spinSpeed);
                 }
             } else if (currentState === 'contact') {
-                if (Math.abs(positionsArr[iy] - ty) < 1) {
-                    positionsArr[iy] = ty + Math.sin(positionsArr[ix] / 5 + time) * 1.5;
+                // Add subtle wave effect without completely replacing position
+                if (Math.abs(positionsArr[iy] - ty) < 2) {
+                    const waveOffset = Math.sin(positionsArr[ix] / 8 + time * 0.5) * 0.5;
+                    positionsArr[iy] += waveOffset * dt;
                 }
             }
 

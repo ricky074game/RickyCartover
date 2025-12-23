@@ -22,7 +22,6 @@
             height: 40px;
             pointer-events: none;
             z-index: 9999999;
-            mix-blend-mode: exclusion;
         }
 
         .cursor-shape {
@@ -245,18 +244,35 @@
         });
 
         // Add hover effects to interactive elements
-        document.querySelectorAll('button, a, .interactive, [onclick]').forEach(el => {
-            el.addEventListener('mouseenter', () => {
+        const interactiveElements = document.querySelectorAll('button, a, .interactive, [onclick]');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                // Prevent any default cursor behavior
+                e.target.style.cursor = 'none';
                 normalCursor.classList.remove('active');
                 hoverCursor.classList.add('active');
-                cursor.style.opacity = '1'; // Ensure cursor stays visible
+                cursor.style.opacity = '1';
             });
-            el.addEventListener('mouseleave', () => {
+            el.addEventListener('mouseleave', (e) => {
+                e.target.style.cursor = 'none';
                 hoverCursor.classList.remove('active');
                 normalCursor.classList.add('active');
-                cursor.style.opacity = '1'; // Ensure cursor stays visible
+                cursor.style.opacity = '1';
+            });
+            el.addEventListener('mousedown', (e) => {
+                e.target.style.cursor = 'none';
+            });
+            el.addEventListener('mouseup', (e) => {
+                e.target.style.cursor = 'none';
             });
         });
+
+        // Continuously ensure cursor: none on all interactive elements
+        setInterval(() => {
+            interactiveElements.forEach(el => {
+                el.style.cursor = 'none';
+            });
+        }, 100);
 
         // Hide cursor over icon elements
         document.querySelectorAll('i.fa-brands, i.fa-solid, svg').forEach(el => {
