@@ -10,7 +10,7 @@ export class StateManager {
         this.currentState = 'home';
     }
 
-    setTargets(type, coords) {
+    setTargets(type, coords, skipCameraTransition = false) {
         const { PARTICLE_COUNT } = CONFIG;
         this.currentState = type;
 
@@ -21,20 +21,22 @@ export class StateManager {
         this.uiManager.showPanel(type);
         this.uiManager.updateNavButtons(type);
 
-        // Camera transition
-        gsap.to(this.camera.position, {
-            z: camConfig.z,
-            x: camConfig.x,
-            y: camConfig.y,
-            duration: 2,
-            ease: 'power2.inOut'
-        });
+        // Camera transition (skip during scroll)
+        if (!skipCameraTransition) {
+            gsap.to(this.camera.position, {
+                z: camConfig.z,
+                x: camConfig.x,
+                y: camConfig.y,
+                duration: 2,
+                ease: 'power2.inOut'
+            });
 
-        // Special camera angles for contact
-        if (type === 'contact') {
-            gsap.to(this.camera.rotation, { x: -0.5, duration: 2, ease: 'power2.inOut' });
-        } else {
-            gsap.to(this.camera.rotation, { x: 0, duration: 2, ease: 'power2.inOut' });
+            // Special camera angles for contact
+            if (type === 'contact') {
+                gsap.to(this.camera.rotation, { x: -0.5, duration: 2, ease: 'power2.inOut' });
+            } else {
+                gsap.to(this.camera.rotation, { x: 0, duration: 2, ease: 'power2.inOut' });
+            }
         }
 
         // Assign target positions and colors

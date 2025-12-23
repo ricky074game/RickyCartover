@@ -76,6 +76,27 @@ class PortfolioApp {
             const coords = this.coordinateGenerator.getCoords(state);
             this.stateManager.setTargets(state, coords);
         };
+
+        // Handle projects scroll to change particle logos
+        this.setupProjectsScrollDetection();
+    }
+
+    setupProjectsScrollDetection() {
+        const scrollContainer = document.getElementById('projects-scroll-container');
+        if (!scrollContainer) return;
+
+        scrollContainer.addEventListener('scroll', () => {
+            if (this.stateManager.getCurrentState() !== 'projects') return;
+
+            const scrollTop = scrollContainer.scrollTop;
+            const itemHeight = 150; // Approximate height of each timeline item
+            const projectIndex = Math.floor(scrollTop / itemHeight);
+
+            const coords = this.coordinateGenerator.getLanguageLogo(projectIndex);
+            if (coords && coords.length > 0) {
+                this.stateManager.setTargets('projects', coords, true);
+            }
+        });
     }
 }
 

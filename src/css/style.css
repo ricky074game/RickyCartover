@@ -72,15 +72,18 @@ body {
     right: 5%;
     top: 50%;
     transform: translateY(-50%);
-    width: 300px;
-    background: rgba(0, 0, 0, 0.7);
-    border-left: 2px solid var(--accent);
-    padding: 20px;
+    width: 320px;
+    max-height: 80vh;
+    background: rgba(0, 0, 0, 0.8);
+    border-left: 3px solid var(--accent);
+    padding: 25px;
     backdrop-filter: blur(10px);
     opacity: 0;
     transition: opacity 0.5s ease, transform 0.5s ease;
     pointer-events: none;
     transform: translateY(-50%) translateX(20px);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 243, 255, 0.1);
 }
 
 .content-panel.visible {

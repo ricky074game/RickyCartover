@@ -1,7 +1,7 @@
 // Application Configuration
 export const CONFIG = {
     PARTICLE_COUNT: 5000,
-    PARTICLE_SIZE: 0.35,
+    PARTICLE_SIZE: 0.55,
     REPULSION_RADIUS: 5,
     REPULSION_STRENGTH: 3,
     SECRET_CODE: 'Barisal07',
