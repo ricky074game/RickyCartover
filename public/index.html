@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/index.min.js"></script>
     <style>
         /* Custom Cursor Styling */
         html, body { cursor: none !important; }
@@ -298,40 +297,6 @@
             });
         });
 
-        // Initialize EmailJS
-        emailjs.init('K-K1yMpLcKb1PVR87');
-
-        // Contact form handler
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
-            const statusDiv = document.getElementById('form-status');
-
-            // Send email using EmailJS
-            emailjs.send('service_portfolio', 'template_portfolio', {
-                to_email: 'ricky.sambataro@gmail.com',
-                from_name: name,
-                from_email: email,
-                message: message
-            }).then(function(response) {
-                console.log('Email sent successfully!', response.status, response.text);
-                statusDiv.textContent = '✓ Message sent successfully!';
-                statusDiv.classList.remove('hidden');
-                document.getElementById('contact-form').reset();
-                
-                // Hide status after 5 seconds
-                setTimeout(() => {
-                    statusDiv.classList.add('hidden');
-                }, 5000);
-            }).catch(function(error) {
-                console.log('Failed to send email:', error);
-                statusDiv.textContent = '✗ Failed to send. Please try again.';
-                statusDiv.classList.remove('hidden');
-            });
-        });
     </script>
 </body>
 </html>

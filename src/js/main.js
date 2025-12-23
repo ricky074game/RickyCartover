@@ -5,6 +5,7 @@ import StateManager from '../modules/stateManager.js';
 import InteractionManager from '../modules/interaction.js';
 import AnimationLoop from '../modules/animation.js';
 import UIManager from '../modules/ui.js';
+import emailjs from '@emailjs/browser';
 
 class PortfolioApp {
     constructor() {
@@ -121,8 +122,57 @@ class PortfolioApp {
     }
 }
 
+// Contact form setup (EmailJS) using env-injected values via Parcel
+function setupContactForm() {
+    const form = document.getElementById('contact-form');
+    const statusDiv = document.getElementById('form-status');
+    if (!form || !statusDiv) return;
+
+    // Parcel replaces these at build time from .env
+    const PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY || '';
+    const SERVICE_ID = process.env.EMAILJS_SERVICE_ID || '';
+    const TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID || '';
+    const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || 'ricky.sambataro@gmail.com';
+
+    if (PUBLIC_KEY) {
+        try { emailjs.init(PUBLIC_KEY); } catch (e) { console.warn('EmailJS init failed', e); }
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault(); // stop page refresh
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const message = document.getElementById('message').value;
+
+        if (!PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
+            statusDiv.textContent = 'Configure EmailJS keys in .env to send.';
+            statusDiv.classList.remove('hidden');
+            return;
+        }
+
+        statusDiv.textContent = 'Sending...';
+        statusDiv.classList.remove('hidden');
+
+        emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+            to_email: CONTACT_TO_EMAIL,
+            from_name: name,
+            from_email: email,
+            message: message
+        }).then(() => {
+            statusDiv.textContent = '✓ Message sent successfully!';
+            form.reset();
+            setTimeout(() => statusDiv.classList.add('hidden'), 5000);
+        }).catch((error) => {
+            console.log('Failed to send email:', error);
+            statusDiv.textContent = '✗ Failed to send. Please try again.';
+        });
+    });
+}
+
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const app = new PortfolioApp();
     app.initialize();
+    setupContactForm();
 });

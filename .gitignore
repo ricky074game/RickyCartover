@@ -3,3 +3,5 @@ dist/
 .parcel-cache/
 .DS_Store
 *.log
+# Environment files
+.env

@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- EmailJS for client-side email sending -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- Font Awesome for UI Icons (not used for particles anymore) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
@@ -67,6 +69,9 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
             clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            /* Ensure nav buttons always receive clicks */
+            pointer-events: auto;
+            cursor: pointer;
         }
 
         .nav-btn:hover, .nav-btn.active {
@@ -247,10 +252,11 @@
         <div id="panel-contact" class="content-panel">
             <h2>Link Up</h2>
             <p>Ready to collaborate on the next big thing?</p>
-            <form class="mt-4 space-y-2" onsubmit="event.preventDefault(); alert('Message simulation sent.');">
-                <input type="email" placeholder="YOUR FREQUENCY (EMAIL)" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive">
-                <textarea rows="3" placeholder="TRANSMISSION DATA" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive"></textarea>
-                <button class="w-full bg-[var(--accent)] text-black font-bold py-2 text-sm hover:bg-white transition-colors interactive">SEND</button>
+            <form id="contact-form" class="mt-4 space-y-2" onsubmit="return false;">
+                <input id="email-input" type="email" placeholder="YOUR FREQUENCY (EMAIL)" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive">
+                <textarea id="message-input" rows="3" placeholder="TRANSMISSION DATA" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive"></textarea>
+                <button id="send-btn" type="button" class="w-full bg-[var(--accent)] text-black font-bold py-2 text-sm hover:bg-white transition-colors interactive">SEND</button>
+                <div id="contact-status" class="text-xs text-gray-400 mt-2"></div>
             </form>
         </div>
 
@@ -258,10 +264,10 @@
         <div class="flex flex-col items-center">
             <div class="mouse-hint">Interact with the particles</div>
             <nav class="flex mb-8 interactive pointer-events-auto">
-                <button class="nav-btn active" onclick="changeState('home')">HOME</button>
-                <button class="nav-btn" onclick="changeState('about')">ABOUT</button>
-                <button class="nav-btn" onclick="changeState('projects')">PROJECTS</button>
-                <button class="nav-btn" onclick="changeState('contact')">CONTACT</button>
+                <button type="button" class="nav-btn interactive active" onclick="changeState('home')">HOME</button>
+                <button type="button" class="nav-btn interactive" onclick="changeState('about')">ABOUT</button>
+                <button type="button" class="nav-btn interactive" onclick="changeState('projects')">PROJECTS</button>
+                <button type="button" class="nav-btn interactive" onclick="changeState('contact')">CONTACT</button>
             </nav>
         </div>
     </div>
@@ -272,6 +278,14 @@
         const PARTICLE_SIZE = 0.35; // Increased size for visibility
         const REPULSION_RADIUS = 5;
         const REPULSION_STRENGTH = 3;
+
+        // EmailJS configuration (fill with your keys)
+        const EMAILJS_PUBLIC_KEY = '';
+        const EMAILJS_SERVICE_ID = '';
+        const EMAILJS_TEMPLATE_ID = '';
+        if (window.emailjs) {
+            try { emailjs.init(EMAILJS_PUBLIC_KEY || ''); } catch(e) { /* ignore */ }
+        }
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
@@ -542,6 +556,75 @@
         window.changeState = (state) => {
             setTargets(state);
         }
+
+        // --- CONTACT SEND HANDLER ---
+        function sendContactMessage() {
+            const emailInput = document.getElementById('email-input');
+            const messageInput = document.getElementById('message-input');
+            const statusEl = document.getElementById('contact-status');
+            const sendBtn = document.getElementById('send-btn');
+
+            const from_email = (emailInput.value || '').trim();
+            const message = (messageInput.value || '').trim();
+
+            // Basic validation
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from_email);
+            if (!emailOk) {
+                statusEl.textContent = 'Please enter a valid email.';
+                statusEl.style.color = '#ff6b6b';
+                return;
+            }
+            if (!message) {
+                statusEl.textContent = 'Please add a message to send.';
+                statusEl.style.color = '#ff6b6b';
+                return;
+            }
+
+            // Disable button during send
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'SENDING…';
+            statusEl.textContent = 'Transmitting via hyperspace…';
+            statusEl.style.color = '#9ca3af';
+
+            const payload = {
+                from_email,
+                message,
+                to_name: 'Riccardo Sambataro',
+                from_name: 'Portfolio Contact',
+            };
+
+            const canSend = window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID;
+            if (!canSend) {
+                // Graceful fallback
+                setTimeout(() => {
+                    statusEl.textContent = 'Message captured locally (configure EmailJS to send).';
+                    statusEl.style.color = '#00f3ff';
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'SEND';
+                }, 600);
+                console.log('Contact message:', payload);
+                return;
+            }
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload)
+                .then(() => {
+                    statusEl.textContent = 'Message sent successfully — I\'ll be in touch!';
+                    statusEl.style.color = '#00f3ff';
+                    emailInput.value = '';
+                    messageInput.value = '';
+                })
+                .catch((err) => {
+                    console.error('EmailJS error:', err);
+                    statusEl.textContent = 'Transmission failed. Please try again later.';
+                    statusEl.style.color = '#ff6b6b';
+                })
+                .finally(() => {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'SEND';
+                });
+        }
+
+        document.getElementById('send-btn').addEventListener('click', sendContactMessage);
 
         // --- INTERACTION ---
         const raycaster = new THREE.Raycaster();
