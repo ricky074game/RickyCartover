@@ -1,3 +1,13 @@
+* { cursor: none; }
+
+html, body {
+    background-color: #050505;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 :root {
     --accent: #00f3ff;
     --bg: #050505;

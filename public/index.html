@@ -8,12 +8,87 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/css/style.css">
+    <style>
+        /* Custom Cursor Styling */
+        * { cursor: none; }
+        
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 99999;
+            mix-blend-mode: exclusion;
+        }
+
+        .cursor-shape {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: scale(0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cursor-shape.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #cursor-normal { transform-origin: top left; } 
+        #cursor-hover { transform-origin: center; animation: spin 0.6s linear infinite; }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
 
     <div id="loader">
         <div style="font-size: 1.5rem; letter-spacing: 5px; color: white;">INITIALIZING SYSTEM</div>
         <div class="loader-bar"><div class="loader-progress" id="progress-bar"></div></div>
+    </div>
+
+    <!-- Custom Cursor Container -->
+    <div id="custom-cursor">
+        <!-- Normal State (Sci-Fi Arrow) -->
+        <div class="cursor-shape active" id="cursor-normal">
+            <svg viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 2L14 26L18 16L28 12L2 2Z" fill="#00f3ff" stroke="white" stroke-width="1.5"/>
+            </svg>
+        </div>
+        
+        <!-- Hover State (Target Reticle) -->
+        <div class="cursor-shape" id="cursor-hover">
+            <svg viewBox="0 0 40 40" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="15" stroke="#ff00ff" stroke-width="2" stroke-dasharray="10 5"/>
+                <circle cx="20" cy="20" r="4" fill="#ff00ff"/>
+                <line x1="20" y1="2" x2="20" y2="8" stroke="#ff00ff" stroke-width="2"/>
+                <line x1="20" y1="32" x2="20" y2="38" stroke="#ff00ff" stroke-width="2"/>
+                <line x1="2" y1="20" x2="8" y2="20" stroke="#ff00ff" stroke-width="2"/>
+                <line x1="32" y1="20" x2="38" y2="20" stroke="#ff00ff" stroke-width="2"/>
+            </svg>
+        </div>
+        
+        <!-- Drag/Grabbing State (Mechanical Hand) -->
+        <div class="cursor-shape" id="cursor-drag">
+            <svg viewBox="0 0 40 40" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Palm -->
+                <rect x="12" y="16" width="16" height="14" rx="2" fill="white" stroke="#00f3ff" stroke-width="2"/>
+                <!-- Fingers -->
+                <rect x="12" y="6" width="4" height="10" rx="2" fill="#00f3ff"/>
+                <rect x="18" y="4" width="4" height="12" rx="2" fill="#00f3ff"/>
+                <rect x="24" y="6" width="4" height="10" rx="2" fill="#00f3ff"/>
+                <!-- Thumb -->
+                <rect x="6" y="20" width="6" height="4" rx="2" fill="#00f3ff"/>
+            </svg>
+        </div>
     </div>
 
     <div id="canvas-container"></div>
@@ -58,7 +133,7 @@
                         <div class="text-xs font-semibold text-[#00bfff] mb-1">MIDDLE SCHOOL</div>
                         <h3 class="font-semibold text-lg">College Admissions Simulator</h3>
                         <span class="text-xs text-gray-400">Java</span>
-                        <p class="text-xs text-gray-400 mt-2">Simulates the college application process with focus on NY students at Stuyvesant High School. Includes weighted GPA, demographic scoring, and early decision/action logic.</p>
+                        <p class="text-xs text-gray-400 mt-2">Simulates the NY college application process for Stuyvesant students. Calculates weighted GPA, demographic scores, and admission probabilities. Supports Early Decision (ED), Restrictive Early Action (REA), and Early Action (EA) applications with real acceptance rates.</p>
                     </div>
 
                     <!-- High School -->
@@ -66,7 +141,7 @@
                         <div class="text-xs font-semibold text-[#00ffaa] mb-1">HIGH SCHOOL</div>
                         <h3 class="font-semibold text-lg">NHS Location</h3>
                         <span class="text-xs text-gray-400">Dart + JavaScript + Firebase</span>
-                        <p class="text-xs text-gray-400 mt-2">Flutter application for NHS members sign-in with location tracking and geospatial features. Built with Firebase backend for real-time data sync.</p>
+                        <p class="text-xs text-gray-400 mt-2">Cross-platform sign-in application for NHS members featuring location-based tracking with geospatial analysis. Built with Flutter for mobile and Firebase Firestore for real-time data synchronization and authentication management.</p>
                     </div>
 
                     <!-- College Year 1 -->
@@ -74,7 +149,7 @@
                         <div class="text-xs font-semibold text-[#ff6b9d] mb-1">COLLEGE</div>
                         <h3 class="font-semibold text-lg">CometOffline</h3>
                         <span class="text-xs text-gray-400">Rust</span>
-                        <p class="text-xs text-gray-400 mt-2">Open source implementation of GOG Galaxy Communication Service. Supports game launchers like Heroic and Lutris. Enables offline game functionality and achievement tracking across platforms.</p>
+                        <p class="text-xs text-gray-400 mt-2">Open-source GOG Galaxy Communication Service implementation in Rust. Enables offline game functionality, achievement tracking, and leaderboard management. Works seamlessly with Heroic, Lutris, and other game launchers on Linux/Steam Deck.</p>
                     </div>
 
                     <!-- College Year 2 -->
@@ -82,7 +157,7 @@
                         <div class="text-xs font-semibold text-[#ffd700] mb-1">COLLEGE</div>
                         <h3 class="font-semibold text-lg">Revolt Ultimate</h3>
                         <span class="text-xs text-gray-400">C#</span>
-                        <p class="text-xs text-gray-400 mt-2">Modern .NET achievement tracking system for multiple platforms (Steam, GOG, Xbox, Epic, EA). Features real-time notifications, custom achievement displays, and leveling system across 8+ gaming platforms.</p>
+                        <p class="text-xs text-gray-400 mt-2">Unified achievement tracking platform for 9+ gaming services (Steam, GOG, Xbox, Epic, EA, RetroAchievements). Real-time notifications with customizable visual designs and a progression system with leveling mechanics. Supports both legitimate and offline game monitoring.</p>
                     </div>
 
                     <!-- College Year 3 -->
@@ -90,7 +165,7 @@
                         <div class="text-xs font-semibold text-[#ff1493] mb-1">COLLEGE</div>
                         <h3 class="font-semibold text-lg">Kawairun2 Server</h3>
                         <span class="text-xs text-gray-400">C# + Java + Node.js</span>
-                        <p class="text-xs text-gray-400 mt-2">Complete reimplementation of Kawairun 2 multiplayer Flash game infrastructure. Includes Windows launcher, SmartFoxServer extension, web server, and database management system (kawairun2.puzzlebest.tech).</p>
+                        <p class="text-xs text-gray-400 mt-2">Full-stack reimplementation of Kawairun 2 multiplayer Flash game. Features .NET launcher, Java/SmartFoxServer backend for multiplayer, Node.js web server, MySQL persistence, and live deployment at kawairun2.puzzlebest.tech.</p>
                     </div>
 
                     <!-- Hackathon -->
@@ -98,7 +173,7 @@
                         <div class="text-xs font-semibold text-[#00ffff] mb-1">HACKATHON</div>
                         <h3 class="font-semibold text-lg">Snowball Thrower</h3>
                         <span class="text-xs text-gray-400">JavaScript + Phaser3 + MediaPipe</span>
-                        <p class="text-xs text-gray-400 mt-2">Phaser3 multiplayer game with optional hand-tracking via webcam using MediaPipe HandLandmarker. Features single-player AI, network multiplayer, sprite animations, snowball physics, and real-time health/charge mechanics.</p>
+                        <p class="text-xs text-gray-400 mt-2">Multiplayer snowball throwing game built with Phaser3 physics engine. Features optional hand-tracking via MediaPipe for gesture recognition, directional sprite animations, AI opponent, networked multiplayer, and dynamic difficulty mechanics.</p>
                     </div>
                 </div>
 
@@ -144,5 +219,40 @@
     </div>
 
     <script type="module" src="../src/js/main.js"></script>
+    
+    <!-- Custom Cursor Handler -->
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        const normalCursor = document.getElementById('cursor-normal');
+        const hoverCursor = document.getElementById('cursor-hover');
+        const dragCursor = document.getElementById('cursor-drag');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = (e.clientX - 20) + 'px';
+            cursor.style.top = (e.clientY - 20) + 'px';
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            normalCursor.classList.remove('active');
+            dragCursor.classList.add('active');
+        });
+
+        document.addEventListener('mouseup', () => {
+            dragCursor.classList.remove('active');
+            normalCursor.classList.add('active');
+        });
+
+        // Add hover effects to interactive elements
+        document.querySelectorAll('button, a, .interactive, [onclick]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                normalCursor.classList.remove('active');
+                hoverCursor.classList.add('active');
+            });
+            el.addEventListener('mouseleave', () => {
+                hoverCursor.classList.remove('active');
+                normalCursor.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
