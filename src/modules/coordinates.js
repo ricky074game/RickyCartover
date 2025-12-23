@@ -77,6 +77,12 @@ export class CoordinateGenerator {
                 }
             }
         }
+        
+        // Debug: log if particles are being generated
+        if (coords.length === 0) {
+            console.warn('No coordinates generated - canvas may be empty');
+        }
+        
         return coords;
     }
 

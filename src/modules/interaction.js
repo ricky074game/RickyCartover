@@ -40,10 +40,7 @@ export class InteractionManager {
                 return;
             }
 
-            // Handle projects state click - open GitHub
-            if (currentState === 'projects') {
-                window.open('https://github.com/ricky074game', '_blank');
-            }
+            // Don't open GitHub on projects click anymore
         });
     }
 
