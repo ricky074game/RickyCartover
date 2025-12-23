@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RICKY // QUANTUM PORTFOLIO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Font Awesome for UI Icons (not used for particles anymore) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f3ff;
+            --bg: #050505;
+        }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: var(--bg); 
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+        }
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        .interactive {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* Navigation Buttons */
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Content Panels */
+        .content-panel {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 2px solid var(--accent);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            transform: translateY(-50%) translateX(20px);
+        }
+        
+        .content-panel.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .content-panel h2 {
+            margin: 0 0 10px 0;
+            color: var(--accent);
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+        
+        .content-panel p {
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #ccc;
+        }
+
+        .project-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 0;
+            transition: padding 0.3s ease;
+            cursor: pointer;
+        }
+        .project-item:hover {
+            padding-left: 10px;
+            border-color: var(--accent);
+        }
+        .project-item h3 { margin: 0; color: white; font-size: 1.2rem;}
+        .project-item span { font-size: 0.8rem; color: var(--accent); }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s ease;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: #333;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .loader-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            transition: width 0.2s;
+        }
+
+        /* Mouse indicator */
+        .mouse-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Floating notification for link */
+        #link-notification {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div style="font-size: 1.5rem; letter-spacing: 5px; color: white;">INITIALIZING SYSTEM</div>
+        <div class="loader-bar"><div class="loader-progress" id="progress-bar"></div></div>
+    </div>
+
+    <div id="canvas-container"></div>
+    
+    <div id="link-notification">CLICK GITHUB LOGO</div>
+
+    <div id="ui-layer">
+        <!-- Header -->
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold tracking-[0.2em] text-white">RICKY<span style="color:var(--accent)">074</span></h1>
+                <div class="text-xs text-gray-500 tracking-widest mt-1">INTERACTIVE PORTFOLIO V5</div>
+            </div>
+            <div class="flex gap-2">
+                <a href="https://github.com/ricky074game" target="_blank" class="interactive text-white hover:text-[var(--accent)] transition-colors text-2xl"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+
+        <!-- Content Panels -->
+        <div id="panel-about" class="content-panel">
+            <h2>Identity</h2>
+            <p>I am a Full Stack Developer & Game Architect. I build digital experiences that break the mold.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">THREE.JS</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">REACT</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">UNITY</span>
+                <span class="px-2 py-1 bg-white/10 text-xs rounded border border-white/10">NODE</span>
+            </div>
+        </div>
+
+        <div id="panel-projects" class="content-panel">
+            <h2>Modules</h2>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Void Runner</h3>
+                <span>UNITY // C# // HLSL</span>
+            </div>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Neural Viz</h3>
+                <span>WEBGL // REACT</span>
+            </div>
+            <div class="project-item" onclick="window.open('https://github.com/ricky074game', '_blank')">
+                <h3>Auto-Bot 9000</h3>
+                <span>PYTHON // AI</span>
+            </div>
+        </div>
+
+        <div id="panel-contact" class="content-panel">
+            <h2>Link Up</h2>
+            <p>Ready to collaborate on the next big thing?</p>
+            <form class="mt-4 space-y-2" onsubmit="event.preventDefault(); alert('Message simulation sent.');">
+                <input type="email" placeholder="YOUR FREQUENCY (EMAIL)" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive">
+                <textarea rows="3" placeholder="TRANSMISSION DATA" class="w-full bg-black/50 border border-gray-700 p-2 text-white text-sm focus:border-[var(--accent)] outline-none interactive"></textarea>
+                <button class="w-full bg-[var(--accent)] text-black font-bold py-2 text-sm hover:bg-white transition-colors interactive">SEND</button>
+            </form>
+        </div>
+
+        <!-- Navigation Bottom -->
+        <div class="flex flex-col items-center">
+            <div class="mouse-hint">Interact with the particles</div>
+            <nav class="flex mb-8 interactive pointer-events-auto">
+                <button class="nav-btn active" onclick="changeState('home')">HOME</button>
+                <button class="nav-btn" onclick="changeState('about')">ABOUT</button>
+                <button class="nav-btn" onclick="changeState('projects')">PROJECTS</button>
+                <button class="nav-btn" onclick="changeState('contact')">CONTACT</button>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const PARTICLE_COUNT = 5000;
+        const PARTICLE_SIZE = 0.35; // Increased size for visibility
+        const REPULSION_RADIUS = 5;
+        const REPULSION_STRENGTH = 3;
+
+        // --- THREE.JS SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.012); 
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.z = 75; 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- PARTICLES ---
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLE_COUNT * 3);
+        const colors = new Float32Array(PARTICLE_COUNT * 3);
+        const currentPositions = new Float32Array(PARTICLE_COUNT * 3);
+        const targetPositions = new Float32Array(PARTICLE_COUNT * 3);
+
+        // Initialize random positions
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+            
+            currentPositions[i * 3] = positions[i * 3];
+            currentPositions[i * 3 + 1] = positions[i * 3 + 1];
+            currentPositions[i * 3 + 2] = positions[i * 3 + 2];
+
+            colors[i * 3] = 0;
+            colors[i * 3 + 1] = 1; 
+            colors[i * 3 + 2] = 1;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(currentPositions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: PARTICLE_SIZE,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: 1.0, // Increased opacity for visibility
+            sizeAttenuation: true
+        });
+
+        const particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
+
+
+        // --- COORDINATE GENERATION ---
+        
+        // 1. TEXT SCANNER
+        function getCanvasCoordinates(text, font, scale = 0.15) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 800; // Wider canvas to fit longer text if needed
+            canvas.height = 200;
+            
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = font;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const coords = [];
+            const step = 3; 
+
+            for (let y = 0; y < canvas.height; y += step) {
+                for (let x = 0; x < canvas.width; x += step) {
+                    const index = (y * canvas.width + x) * 4;
+                    if (data[index] > 50) { 
+                        coords.push({
+                            x: (x - canvas.width / 2) * scale,
+                            y: -(y - canvas.height / 2) * scale,
+                            z: 0
+                        });
+                    }
+                }
+            }
+            return coords;
+        }
+
+        let homeCoords = [];
+        let aboutCoords = [];
+        let projectCoords = [];
+        let contactCoords = [];
+
+        async function generateCoordinates() {
+            // 1. Home: Text "RICKY074" (Initial)
+            homeCoords = getCanvasCoordinates("RICKY", 'bold 80px "Rajdhani"', 0.25);
+            
+            // 2. About: SPHERE (Math)
+            const r = 12;
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                aboutCoords.push({
+                    x: r * Math.sin(phi) * Math.cos(theta),
+                    y: r * Math.sin(phi) * Math.sin(theta),
+                    z: r * Math.cos(phi)
+                });
+            }
+
+            // 3. Projects: HELIX / DNA (Math)
+            const helixRadius = 8;
+            const helixHeight = 40;
+            const turns = 3;
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const angle = (i / PARTICLE_COUNT) * Math.PI * 2 * turns;
+                const y = ((i / PARTICLE_COUNT) - 0.5) * helixHeight;
+                // Double helix
+                const isStrand2 = i % 2 === 0 ? 1 : -1;
+                
+                projectCoords.push({
+                    x: Math.cos(angle) * helixRadius * isStrand2,
+                    y: y,
+                    z: Math.sin(angle) * helixRadius * isStrand2
+                });
+            }
+            
+            // 4. Contact: WAVE PLANE (Math)
+            const gridSize = 60; 
+            const gridStep = 0.8;
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                // If we run out of grid spots, scatter randomly
+                if(i > gridSize * gridSize) {
+                    contactCoords.push({ x: (Math.random()-0.5)*50, y: -20, z: (Math.random()-0.5)*50 });
+                    continue;
+                }
+                const x = (i % gridSize) - (gridSize/2);
+                const z = Math.floor(i / gridSize) - (gridSize/2);
+                contactCoords.push({
+                    x: x * gridStep,
+                    y: Math.sin(x/5) * Math.cos(z/5) * 4 - 5, // Wave offset
+                    z: z * gridStep
+                });
+            }
+            
+            return true;
+        }
+
+        // --- CHEAT CODE LOGIC ---
+        function updateHomeText(newText) {
+            // Smaller font for longer text "Yay Ricky!" to fit in camera
+            homeCoords = getCanvasCoordinates(newText, 'bold 60px "Rajdhani"', 0.25);
+            if(currentState === 'home') {
+                setTargets('home');
+            }
+        }
+
+        let keyBuffer = "";
+        const secretCode = "Barisal07";
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key.length === 1) { // Only track printable keys
+                keyBuffer += e.key;
+                if(keyBuffer.length > secretCode.length) {
+                    keyBuffer = keyBuffer.slice(-secretCode.length);
+                }
+                
+                if(keyBuffer === secretCode) {
+                    updateHomeText("Yay Ricky!");
+                    // Reset buffer to prevent multiple triggers
+                    keyBuffer = "";
+                }
+            }
+        });
+
+        // --- STATE MANAGEMENT ---
+        let currentState = 'home';
+        
+        function setTargets(type) {
+            currentState = type;
+            let coords;
+            let colorSet = { r: 0, g: 1, b: 1 };
+            let camZ = 75; // Standard viewing distance
+            
+            const linkNotification = document.getElementById('link-notification');
+            linkNotification.style.opacity = '0';
+
+            if (type === 'home') {
+                coords = homeCoords;
+                colorSet = { r: 0, g: 0.95, b: 1 }; // Cyan
+            } else if (type === 'about') {
+                coords = aboutCoords;
+                colorSet = { r: 1, g: 0, b: 0.5 }; // Pink
+                camZ = 60; // Zoom in for sphere
+            } else if (type === 'projects') {
+                coords = projectCoords;
+                colorSet = { r: 0.5, g: 0, b: 1 }; // Purple
+                camZ = 60;
+            } else if (type === 'contact') {
+                coords = contactCoords;
+                colorSet = { r: 0, g: 1, b: 0.5 }; // Green
+                camZ = 50; // Angle down for plane
+            }
+
+            // UI Panels
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('visible'));
+            document.getElementById(`panel-${type}`)?.classList.add('visible');
+
+            // Nav Buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(b => {
+                if(b.innerText.toLowerCase().includes(type)) b.classList.add('active');
+            });
+
+            // Camera Transition
+            gsap.to(camera.position, { z: camZ, x: 0, y: 0, duration: 2, ease: "power2.inOut" });
+            
+            // Special camera angles
+            if (type === 'contact') {
+                gsap.to(camera.rotation, { x: -0.5, duration: 2, ease: "power2.inOut" });
+                gsap.to(camera.position, { y: 20, duration: 2, ease: "power2.inOut" });
+            } else {
+                gsap.to(camera.rotation, { x: 0, duration: 2, ease: "power2.inOut" });
+            }
+
+            // Assign targets
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                let tx, ty, tz;
+                
+                if (coords && coords.length > 0) {
+                    const index = i % coords.length;
+                    const c = coords[index];
+                    
+                    // Add noise for extras
+                    const isExtra = i >= coords.length;
+                    const noise = isExtra ? 50 : 0.2; 
+                    
+                    tx = c.x + (Math.random() - 0.5) * noise;
+                    ty = c.y + (Math.random() - 0.5) * noise;
+                    tz = isExtra ? (Math.random() - 0.5) * 60 : c.z + (Math.random() - 0.5) * noise;
+                    
+                    if (type === 'contact' && !isExtra) tz = c.z; // Flatten plane
+                    
+                } else {
+                    tx = (Math.random()-0.5)*50;
+                    ty = (Math.random()-0.5)*50;
+                    tz = (Math.random()-0.5)*50;
+                }
+
+                targetPositions[i * 3] = tx;
+                targetPositions[i * 3 + 1] = ty;
+                targetPositions[i * 3 + 2] = tz;
+
+                // Color Tween
+                gsap.to(colors, {
+                    [i*3]: colorSet.r,
+                    [i*3+1]: colorSet.g,
+                    [i*3+2]: colorSet.b,
+                    duration: 1.5,
+                    onUpdate: () => { particleSystem.geometry.attributes.color.needsUpdate = true; }
+                });
+            }
+        }
+
+        window.changeState = (state) => {
+            setTargets(state);
+        }
+
+        // --- INTERACTION ---
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+
+        document.addEventListener('mousemove', (event) => {
+            pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+            pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        document.addEventListener('click', (event) => {
+             // Re-enabled clicking canvas opens github if in projects mode
+            if (currentState === 'projects') {
+                 if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'A' && !event.target.closest('.content-panel')) {
+                    // window.open('https://github.com/ricky074game', '_blank');
+                }
+            }
+        });
+
+        // --- ANIMATION LOOP ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const dt = clock.getDelta();
+            const time = clock.getElapsedTime();
+            
+            raycaster.setFromCamera(pointer, camera);
+
+            const positionsArr = particleSystem.geometry.attributes.position.array;
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const ix = i * 3;
+                const iy = i * 3 + 1;
+                const iz = i * 3 + 2;
+
+                const tx = targetPositions[ix];
+                const ty = targetPositions[iy];
+                const tz = targetPositions[iz];
+
+                // Lerp towards target
+                const ease = 3.0 * dt; 
+                positionsArr[ix] += (tx - positionsArr[ix]) * ease;
+                positionsArr[iy] += (ty - positionsArr[iy]) * ease;
+                positionsArr[iz] += (tz - positionsArr[iz]) * ease;
+                
+                // Add natural movement based on shape
+                if (currentState === 'projects') {
+                    // Spin Helix
+                     // Calculate radial distance
+                    const r = Math.sqrt(positionsArr[ix]**2 + positionsArr[iz]**2);
+                    if(r < 15) { // Only spin the core helix
+                        const spinSpeed = 1.0 * dt;
+                        const x = positionsArr[ix];
+                        const z = positionsArr[iz];
+                        positionsArr[ix] = x * Math.cos(spinSpeed) - z * Math.sin(spinSpeed);
+                        positionsArr[iz] = x * Math.sin(spinSpeed) + z * Math.cos(spinSpeed);
+                    }
+                } else if (currentState === 'contact') {
+                    // Wave motion
+                    if(Math.abs(positionsArr[iy] - ty) < 1) { // Only wave if close to target
+                        positionsArr[iy] = ty + Math.sin(positionsArr[ix]/5 + time) * 1.5;
+                    }
+                }
+
+                // Mouse Repulsion
+                const dx = positionsArr[ix] - (pointer.x * 35); // Approx scaling
+                const dy = positionsArr[iy] - (pointer.y * 35);
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < REPULSION_RADIUS) {
+                    const force = (REPULSION_RADIUS - dist) * REPULSION_STRENGTH;
+                    const angle = Math.atan2(dy, dx);
+                    positionsArr[ix] += Math.cos(angle) * force * dt * 10;
+                    positionsArr[iy] += Math.sin(angle) * force * dt * 10;
+                }
+            }
+
+            // Gentle Global Rotation
+            if (currentState !== 'contact') { // Contact has specific cam angle, don't rotate system
+                const targetRotX = -(pointer.y * 0.1); 
+                const targetRotY = (pointer.x * 0.1); 
+                
+                particleSystem.rotation.x += (targetRotX - particleSystem.rotation.x) * 2 * dt;
+                particleSystem.rotation.y += (targetRotY - particleSystem.rotation.y) * 2 * dt;
+            }
+
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        // --- INITIALIZATION ---
+        const progressBar = document.getElementById('progress-bar');
+        const loader = document.getElementById('loader');
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 5;
+            if(progress > 90) clearInterval(interval);
+            progressBar.style.width = `${progress}%`;
+        }, 50);
+
+        generateCoordinates().then(() => {
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 1000);
+                    
+                    setTargets('home');
+                    animate();
+                }, 500);
+            }, 1000);
+        });
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>

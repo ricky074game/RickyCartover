@@ -1,0 +1,22 @@
+{
+  "name": "ricky-quantum-portfolio",
+  "version": "5.0.0",
+  "description": "Interactive quantum portfolio with particle system",
+  "main": "src/js/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "parcel public/index.html --port 3000",
+    "build": "parcel build public/index.html --dist-dir dist",
+    "start": "parcel public/index.html --port 3000"
+  },
+  "keywords": ["portfolio", "three.js", "particles", "interactive"],
+  "author": "Ricky",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.128.0",
+    "gsap": "^3.12.2"
+  },
+  "devDependencies": {
+    "parcel": "^2.10.0"
+  }
+}
