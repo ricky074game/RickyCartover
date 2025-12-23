@@ -11,10 +11,47 @@ export class AnimationLoop {
         this.interactionManager = interactionManager;
         this.clock = new THREE.Clock();
         this.isRunning = false;
+        
+        // Camera rotation on drag
+        this.isDragging = false;
+        this.dragStart = { x: 0, y: 0 };
+        this.cameraRotation = { x: 0, y: 0 };
+        
+        // Dynamic particle movement
+        this.particleVelocities = new Float32Array(CONFIG.PARTICLE_COUNT * 3);
+    }
+
+    initializeInteractions() {
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && e.target === this.renderer.domElement) {
+                this.isDragging = true;
+                this.dragStart = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const deltaX = e.clientX - this.dragStart.x;
+                const deltaY = e.clientY - this.dragStart.y;
+                
+                this.cameraRotation.y += deltaX * 0.005;
+                this.cameraRotation.x += deltaY * 0.005;
+                
+                // Clamp x rotation
+                this.cameraRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.cameraRotation.x));
+                
+                this.dragStart = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            this.isDragging = false;
+        });
     }
 
     start() {
         this.isRunning = true;
+        this.initializeInteractions();
         this.animate();
     }
 
@@ -50,6 +87,24 @@ export class AnimationLoop {
             positionsArr[iy] += (ty - positionsArr[iy]) * ease;
             positionsArr[iz] += (tz - positionsArr[iz]) * ease;
 
+            // Dynamic particle movement (living space effect)
+            const distToTarget = Math.sqrt(
+                (positionsArr[ix] - tx) ** 2 +
+                (positionsArr[iy] - ty) ** 2 +
+                (positionsArr[iz] - tz) ** 2
+            );
+            
+            if (distToTarget > 0.5) {
+                // Particle is far from target, add subtle wandering
+                const noise = Math.sin(time * 0.5 + i) * 0.02;
+                const noise2 = Math.cos(time * 0.3 + i * 0.5) * 0.02;
+                const noise3 = Math.sin(time * 0.4 + i * 0.7) * 0.02;
+                
+                positionsArr[ix] += noise;
+                positionsArr[iy] += noise2;
+                positionsArr[iz] += noise3;
+            }
+
             // Add natural movement based on shape
             if (currentState === 'projects') {
                 const r = Math.sqrt(positionsArr[ix] ** 2 + positionsArr[iz] ** 2);
@@ -79,14 +134,13 @@ export class AnimationLoop {
             }
         }
 
-        // Gentle global rotation
-        if (currentState !== 'contact') {
-            const targetRotX = -(pointer.y * 0.1);
-            const targetRotY = pointer.x * 0.1;
-
-            const ps = this.particleSystem.getParticleSystem();
-            ps.rotation.x += (targetRotX - ps.rotation.x) * 2 * dt;
-            ps.rotation.y += (targetRotY - ps.rotation.y) * 2 * dt;
+        // Update camera rotation with drag
+        if (this.isDragging || (this.cameraRotation.x !== 0 || this.cameraRotation.y !== 0)) {
+            const euler = new THREE.Euler(this.cameraRotation.x, this.cameraRotation.y, 0, 'YXZ');
+            const radius = this.camera.position.length();
+            const direction = new THREE.Vector3(0, 0, 1).applyEuler(euler);
+            this.camera.position.copy(direction.multiplyScalar(radius));
+            this.camera.lookAt(0, 0, 0);
         }
 
         this.particleSystem.updatePositions();
