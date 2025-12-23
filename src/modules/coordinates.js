@@ -54,7 +54,7 @@ export class CoordinateGenerator {
 
         ctx.strokeStyle = 'white';
         ctx.fillStyle = 'white';
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 16;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 

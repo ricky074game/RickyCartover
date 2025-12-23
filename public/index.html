@@ -243,7 +243,7 @@
             cursor.style.opacity = '1'; // Ensure cursor stays visible
         });
 
-        // Add hover effects to interactive elements
+        // Add hover effects to interactive elements - only show hover reticle, not drag hand
         const interactiveElements = document.querySelectorAll('button, a, .interactive, [onclick]');
         interactiveElements.forEach(el => {
             el.addEventListener('mouseenter', (e) => {
@@ -259,12 +259,7 @@
                 normalCursor.classList.add('active');
                 cursor.style.opacity = '1';
             });
-            el.addEventListener('mousedown', (e) => {
-                e.target.style.cursor = 'none';
-            });
-            el.addEventListener('mouseup', (e) => {
-                e.target.style.cursor = 'none';
-            });
+            // Don't change to drag cursor on links - only on canvas
         });
 
         // Continuously ensure cursor: none on all interactive elements
@@ -273,6 +268,24 @@
                 el.style.cursor = 'none';
             });
         }, 100);
+
+        // Only show drag cursor when clicking on canvas/particles, not on links
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.addEventListener('mousedown', (e) => {
+                if (e.target === canvasContainer) {
+                    normalCursor.classList.remove('active');
+                    dragCursor.classList.add('active');
+                    cursor.style.opacity = '1';
+                }
+            });
+
+            canvasContainer.addEventListener('mouseup', () => {
+                dragCursor.classList.remove('active');
+                normalCursor.classList.add('active');
+                cursor.style.opacity = '1';
+            });
+        }
 
         // Hide cursor over icon elements
         document.querySelectorAll('i.fa-brands, i.fa-solid, svg').forEach(el => {
