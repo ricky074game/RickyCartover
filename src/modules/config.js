@@ -1,6 +1,6 @@
 // Application Configuration
 export const CONFIG = {
-    PARTICLE_COUNT: 5000,
+    PARTICLE_COUNT: 10000,
     PARTICLE_SIZE: 0.55,
     REPULSION_RADIUS: 5,
     REPULSION_STRENGTH: 3,

@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 export class InteractionManager {
-    constructor(stateManager, coordinateGenerator) {
+    constructor(stateManager, coordinateGenerator, renderer) {
         this.stateManager = stateManager;
         this.coordinateGenerator = coordinateGenerator;
+        this.renderer = renderer;
         this.raycaster = new THREE.Raycaster();
         this.pointer = new THREE.Vector2();
         this.keyBuffer = '';
@@ -12,8 +13,19 @@ export class InteractionManager {
 
     initialize() {
         document.addEventListener('mousemove', (event) => {
-            this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-            this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            // Use renderer canvas bounds for accurate normalization
+            // even when UI changes alter layout or canvas size/position.
+            if (this.renderer && this.renderer.domElement) {
+                const rect = this.renderer.domElement.getBoundingClientRect();
+                const x = (event.clientX - rect.left) / rect.width;
+                const y = (event.clientY - rect.top) / rect.height;
+                this.pointer.x = x * 2 - 1;
+                this.pointer.y = -(y * 2 - 1);
+            } else {
+                // Fallback to window size if renderer is unavailable
+                this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+                this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }
         });
 
         document.addEventListener('keydown', (e) => {

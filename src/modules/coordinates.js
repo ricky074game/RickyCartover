@@ -43,27 +43,30 @@ export class CoordinateGenerator {
         return coords;
     }
 
-    drawIcon(drawFunction, scale = 0.15) {
+    drawIcon(drawFunction, scale = 0.12) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 400;
-        canvas.height = 400;
+        // Larger canvas for crisper sampling
+        canvas.width = 800;
+        canvas.height = 800;
 
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // Thicker, rounded strokes for clarity akin to the RICKY logo
         ctx.strokeStyle = 'white';
         ctx.fillStyle = 'white';
-        ctx.lineWidth = 16;
+        ctx.lineWidth = 28;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
-        drawFunction(ctx, canvas.width / 2, canvas.height / 2, 80);
+        drawFunction(ctx, canvas.width / 2, canvas.height / 2, 160);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         const coords = [];
-        const step = 3;
+        // Denser sampling to produce thicker, more solid point clouds
+        const step = 2;
 
         for (let y = 0; y < canvas.height; y += step) {
             for (let x = 0; x < canvas.width; x += step) {
@@ -77,12 +80,11 @@ export class CoordinateGenerator {
                 }
             }
         }
-        
-        // Debug: log if particles are being generated
+
         if (coords.length === 0) {
             console.warn('No coordinates generated - canvas may be empty');
         }
-        
+
         return coords;
     }
 
@@ -380,21 +382,21 @@ export class CoordinateGenerator {
         this.homeCoords = this.getCanvasCoordinates("RICKY", 'bold 150px "Rajdhani"', 0.2);
 
         // 2. About: Human icon
-        this.aboutCoords = this.drawIcon((ctx, cx, cy, size) => this.drawHumanIcon(ctx, cx, cy, size), 0.08);
+        this.aboutCoords = this.drawIcon((ctx, cx, cy, size) => this.drawHumanIcon(ctx, cx, cy, size), 0.12);
 
         // 3. Projects: GitHub logo (updated)
-        this.projectCoords = this.drawIcon((ctx, cx, cy, size) => this.drawGithubLogoAdvanced(ctx, cx, cy, size), 0.08);
+        this.projectCoords = this.drawIcon((ctx, cx, cy, size) => this.drawGithubLogoAdvanced(ctx, cx, cy, size), 0.12);
 
         // 4. Contact: Envelope icon
-        this.contactCoords = this.drawIcon((ctx, cx, cy, size) => this.drawEnvelopeIcon(ctx, cx, cy, size), 0.08);
+        this.contactCoords = this.drawIcon((ctx, cx, cy, size) => this.drawEnvelopeIcon(ctx, cx, cy, size), 0.12);
 
         // Language logos for timeline scrolling
-        this.javaCoords = this.drawIcon((ctx, cx, cy, size) => this.drawJavaLogo(ctx, cx, cy, size), 0.08);
-        this.dartCoords = this.drawIcon((ctx, cx, cy, size) => this.drawDartLogo(ctx, cx, cy, size), 0.08);
-        this.rustCoords = this.drawIcon((ctx, cx, cy, size) => this.drawRustLogo(ctx, cx, cy, size), 0.08);
-        this.csharpCoords = this.drawIcon((ctx, cx, cy, size) => this.drawCSharpLogo(ctx, cx, cy, size), 0.08);
-        this.nodejsCoords = this.drawIcon((ctx, cx, cy, size) => this.drawNodeJSLogo(ctx, cx, cy, size), 0.08);
-        this.javascriptCoords = this.drawIcon((ctx, cx, cy, size) => this.drawJavaScriptLogo(ctx, cx, cy, size), 0.08);
+        this.javaCoords = this.drawIcon((ctx, cx, cy, size) => this.drawJavaLogo(ctx, cx, cy, size), 0.12);
+        this.dartCoords = this.drawIcon((ctx, cx, cy, size) => this.drawDartLogo(ctx, cx, cy, size), 0.12);
+        this.rustCoords = this.drawIcon((ctx, cx, cy, size) => this.drawRustLogo(ctx, cx, cy, size), 0.12);
+        this.csharpCoords = this.drawIcon((ctx, cx, cy, size) => this.drawCSharpLogo(ctx, cx, cy, size), 0.12);
+        this.nodejsCoords = this.drawIcon((ctx, cx, cy, size) => this.drawNodeJSLogo(ctx, cx, cy, size), 0.12);
+        this.javascriptCoords = this.drawIcon((ctx, cx, cy, size) => this.drawJavaScriptLogo(ctx, cx, cy, size), 0.12);
 
         return true;
     }

@@ -23,7 +23,14 @@ export class AnimationLoop {
 
     initializeInteractions() {
         document.addEventListener('mousedown', (e) => {
-            if (e.button === 0 && e.target === this.renderer.domElement) {
+            const isPaintMode = document.body.classList.contains('paint-mode');
+            
+            // Normal mode: left-click drag
+            // Paint mode: right-click drag
+            if (!isPaintMode && e.button === 0 && e.target === this.renderer.domElement) {
+                this.isDragging = true;
+                this.dragStart = { x: e.clientX, y: e.clientY };
+            } else if (isPaintMode && e.button === 2 && e.target === this.renderer.domElement) {
                 this.isDragging = true;
                 this.dragStart = { x: e.clientX, y: e.clientY };
             }
@@ -76,10 +83,11 @@ export class AnimationLoop {
         const raycaster = this.interactionManager.raycaster;
         raycaster.setFromCamera(pointer, this.camera);
         
-        // Get a point along the raycaster direction (at z=0 plane for 2D repulsion)
+        // Map cursor to world using a fixed z=0 plane for consistency.
+        // This ensures hover/repulsion behaves the same across states.
         const direction = raycaster.ray.direction;
         const origin = raycaster.ray.origin;
-        const t = -origin.z / direction.z; // Find where ray intersects z=0 plane
+        const t = -origin.z / direction.z;
         const mouseWorldPos = new THREE.Vector3(
             origin.x + direction.x * t,
             origin.y + direction.y * t,
@@ -107,13 +115,16 @@ export class AnimationLoop {
                 (positionsArr[iy] - ty) ** 2 +
                 (positionsArr[iz] - tz) ** 2
             );
-            
-            if (distToTarget > 0.5) {
-                // Particle is far from target, add subtle wandering
+
+            // In Paint Mode, always apply subtle wandering so drawn particles feel alive
+            const isPaintMode = document.body.classList.contains('paint-mode');
+            const shouldWander = isPaintMode || distToTarget > 0.5;
+
+            if (shouldWander) {
                 const noise = Math.sin(time * 0.5 + i) * 0.02;
                 const noise2 = Math.cos(time * 0.3 + i * 0.5) * 0.02;
                 const noise3 = Math.sin(time * 0.4 + i * 0.7) * 0.02;
-                
+
                 positionsArr[ix] += noise;
                 positionsArr[iy] += noise2;
                 positionsArr[iz] += noise3;
@@ -137,16 +148,18 @@ export class AnimationLoop {
                 }
             }
 
-            // Mouse repulsion using world space coordinates
-            const dx = positionsArr[ix] - mouseWorldPos.x;
-            const dy = positionsArr[iy] - mouseWorldPos.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+            // Mouse repulsion using world space coordinates (disabled in Paint Mode)
+            if (!document.body.classList.contains('paint-mode')) {
+                const dx = positionsArr[ix] - mouseWorldPos.x;
+                const dy = positionsArr[iy] - mouseWorldPos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < REPULSION_RADIUS && dist > 0.01) {
-                const force = (REPULSION_RADIUS - dist) * REPULSION_STRENGTH;
-                const angle = Math.atan2(dy, dx);
-                positionsArr[ix] += Math.cos(angle) * force * dt * 10;
-                positionsArr[iy] += Math.sin(angle) * force * dt * 10;
+                if (dist < REPULSION_RADIUS && dist > 0.01) {
+                    const force = (REPULSION_RADIUS - dist) * REPULSION_STRENGTH;
+                    const angle = Math.atan2(dy, dx);
+                    positionsArr[ix] += Math.cos(angle) * force * dt * 10;
+                    positionsArr[iy] += Math.sin(angle) * force * dt * 10;
+                }
             }
         }
 

@@ -47,6 +47,85 @@
         #cursor-drag { z-index: 9999999 !important; }
         
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Paint Mode Override: always show reticle unless dragging */
+        body.paint-mode * { cursor: none !important; }
+        body.paint-mode #cursor-normal { opacity: 0 !important; }
+        body.paint-mode #cursor-hover { opacity: 1 !important; }
+        body.paint-mode #cursor-drag { opacity: 0 !important; }
+        
+        /* Wipe Overlay */
+        #wipe-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #wipe-overlay.active { opacity: 1; }
+        
+        /* Paint UI */
+        #paint-ui {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent);
+            padding: 15px 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #paint-ui.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #paint-ui label {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #paint-ui input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--accent);
+            border-radius: 5px;
+            cursor: pointer;
+            background: transparent;
+        }
+        #paint-ui input[type="range"] {
+            width: 150px;
+            cursor: pointer;
+        }
+        #paint-ui button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #paint-ui button:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -93,6 +172,22 @@
     </div>
 
     <div id="canvas-container"></div>
+    
+    <div id="wipe-overlay"></div>
+    
+    <!-- Paint Mode UI -->
+    <div id="paint-ui" class="hidden">
+        <label for="paint-color">Color:</label>
+        <input type="color" id="paint-color" value="#00f3ff">
+        
+        <label for="paint-strength">Depth:</label>
+        <input type="range" id="paint-strength" min="20" max="100" value="50" step="5">
+        <span id="paint-strength-value" style="color: var(--accent); font-weight: 700; min-width: 40px;">50</span>
+        
+        <span id="paint-counter" style="color: var(--accent); font-weight: 700; min-width: 80px;">0 / 0</span>
+        
+        <button id="paint-close">✕ Exit</button>
+    </div>
     
     <div id="link-notification">CLICK GITHUB LOGO</div>
 
@@ -230,6 +325,10 @@
             cursor.style.top = (e.clientY - 20) + 'px';
         });
 
+        // Paint mode: allow right-click drag for camera rotation
+        // Track if we're dragging with right mouse button
+        let isRightDragging = false;
+
         // Only show drag cursor when clicking on canvas/particles, not on links
         const canvasContainer = document.getElementById('canvas-container');
         if (canvasContainer) {
@@ -237,19 +336,35 @@
             let isDraggingOnCanvas = false;
             
             canvasContainer.addEventListener('mousedown', (e) => {
-                if (e.button === 0) { // Left click only
+                // In paint mode, right-click = drag camera
+                const isPaintMode = document.body.classList.contains('paint-mode');
+                
+                if (e.button === 0 && !isPaintMode) { // Left click (normal mode)
                     isDraggingOnCanvas = true;
                     normalCursor.classList.remove('active');
+                    dragCursor.classList.add('active');
+                    hoverCursor.classList.remove('active');
+                    cursor.style.opacity = '1';
+                } else if (e.button === 2 && isPaintMode) { // Right click (paint mode)
+                    isRightDragging = true;
+                    hoverCursor.classList.remove('active');
                     dragCursor.classList.add('active');
                     cursor.style.opacity = '1';
                 }
             });
 
-            canvasContainer.addEventListener('mouseup', () => {
-                isDraggingOnCanvas = false;
-                dragCursor.classList.remove('active');
-                normalCursor.classList.add('active');
-                cursor.style.opacity = '1';
+            canvasContainer.addEventListener('mouseup', (e) => {
+                if (e.button === 0) {
+                    isDraggingOnCanvas = false;
+                    dragCursor.classList.remove('active');
+                    normalCursor.classList.add('active');
+                    cursor.style.opacity = '1';
+                } else if (e.button === 2) {
+                    isRightDragging = false;
+                    dragCursor.classList.remove('active');
+                    hoverCursor.classList.add('active');
+                    cursor.style.opacity = '1';
+                }
             });
 
             canvasContainer.addEventListener('mouseleave', () => {
@@ -258,6 +373,19 @@
                     dragCursor.classList.remove('active');
                     normalCursor.classList.add('active');
                     cursor.style.opacity = '1';
+                }
+                if (isRightDragging) {
+                    isRightDragging = false;
+                    dragCursor.classList.remove('active');
+                    hoverCursor.classList.add('active');
+                    cursor.style.opacity = '1';
+                }
+            });
+            
+            // Prevent context menu on right click in paint mode
+            canvasContainer.addEventListener('contextmenu', (e) => {
+                if (document.body.classList.contains('paint-mode')) {
+                    e.preventDefault();
                 }
             });
         }

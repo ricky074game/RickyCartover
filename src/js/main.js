@@ -5,6 +5,7 @@ import StateManager from '../modules/stateManager.js';
 import InteractionManager from '../modules/interaction.js';
 import AnimationLoop from '../modules/animation.js';
 import UIManager from '../modules/ui.js';
+import { Painter } from '../modules/painter.js';
 import emailjs from '@emailjs/browser';
 
 class PortfolioApp {
@@ -16,6 +17,7 @@ class PortfolioApp {
         this.interactionManager = null;
         this.animationLoop = null;
         this.uiManager = null;
+        this.painter = null;
     }
 
     async initialize() {
@@ -43,8 +45,17 @@ class PortfolioApp {
         this.stateManager = new StateManager(this.particleSystem, camera, {}, this.uiManager);
 
         // Setup interaction
-        this.interactionManager = new InteractionManager(this.stateManager, this.coordinateGenerator);
+        this.interactionManager = new InteractionManager(this.stateManager, this.coordinateGenerator, renderer);
         this.interactionManager.initialize();
+
+        // Setup Painter (pass particleSystem for direct manipulation)
+        this.painter = new Painter(this.stateManager, this.coordinateGenerator, scene, camera, this.particleSystem);
+        
+        // Setup painter cheat code listener
+        this.setupPainterCheatCode();
+        
+        // Setup painter UI handlers
+        this.setupPainterUI();
 
         // Setup animation loop
         this.animationLoop = new AnimationLoop(
@@ -101,6 +112,52 @@ class PortfolioApp {
                 counter.textContent = `${currentProjectIndex + 1} / 6`;
             }
         };
+    }
+
+    setupPainterCheatCode() {
+        let paintKeyBuffer = '';
+        const paintCode = 'painttime';
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key.length === 1) {
+                paintKeyBuffer += e.key;
+                if (paintKeyBuffer.length > paintCode.length) {
+                    paintKeyBuffer = paintKeyBuffer.slice(-paintCode.length);
+                }
+                
+                if (paintKeyBuffer === paintCode) {
+                    this.painter.enter();
+                    paintKeyBuffer = '';
+                }
+            }
+        });
+    }
+    
+    setupPainterUI() {
+        const colorPicker = document.getElementById('paint-color');
+        const strengthSlider = document.getElementById('paint-strength');
+        const strengthValue = document.getElementById('paint-strength-value');
+        const closeBtn = document.getElementById('paint-close');
+        
+        if (colorPicker) {
+            colorPicker.addEventListener('input', (e) => {
+                this.painter.setColor(e.target.value);
+            });
+        }
+        
+        if (strengthSlider && strengthValue) {
+            strengthSlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                strengthValue.textContent = val;
+                this.painter.setStrength(parseFloat(val));
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.painter.exit();
+            });
+        }
     }
 
     setupProjectsScrollDetection() {
