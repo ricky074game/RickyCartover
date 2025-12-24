@@ -10,11 +10,11 @@ export class StateManager {
         this.currentState = 'home';
     }
 
-    setTargets(type, coords, skipCameraTransition = false) {
+    setTargets(type, coords, skipCameraTransition = false, colorOverride = null) {
         const { PARTICLE_COUNT } = CONFIG;
         this.currentState = type;
 
-        const colorSet = CONFIG.COLORS[type.toUpperCase()] || CONFIG.COLORS.HOME;
+        const colorSet = colorOverride || CONFIG.COLORS[type.toUpperCase()] || CONFIG.COLORS.HOME;
         const camConfig = CONFIG.CAMERA[type.toUpperCase()] || CONFIG.CAMERA.HOME;
 
         this.uiManager.hideLinkNotification();
@@ -113,7 +113,7 @@ export class StateManager {
                 targetPositions[i * 3 + 1] = ty;
                 targetPositions[i * 3 + 2] = tz;
 
-                // Color tween to the state's uniform color
+                // Color tween to the state's uniform (or overridden) color
                 gsap.to(colorArray, {
                     [i * 3]: colorSet.r,
                     [i * 3 + 1]: colorSet.g,

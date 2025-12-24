@@ -71,9 +71,10 @@ class PortfolioApp {
         clearInterval(loadingInterval);
         await this.uiManager.completeLoading();
 
-        // Initialize home state
+        // Initialize home state with a random color override on first load
         const homeCoords = this.coordinateGenerator.getCoords('home');
-        this.stateManager.setTargets('home', homeCoords);
+        const randomColor = { r: Math.random(), g: Math.random(), b: Math.random() };
+        this.stateManager.setTargets('home', homeCoords, false, randomColor);
 
         // Start animation
         this.animationLoop.start();
